@@ -3,7 +3,7 @@ LSTM Network template for regression
 
 Predict real valued output over multiple timesteps, given sequential inputdata. Formally, this LSTM network fits parameters to compute the function:
 
-R^(timesteps, input_dim) --> R^output_dim
+R^(timesteps, input_dim) --> R^(timesteps, output_dim)
 
 Where
 
