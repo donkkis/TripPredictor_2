@@ -1,7 +1,7 @@
 
 # LSTM Network template for regression
 
-<b> TL;DR : See <a href="https://github.com/donkkis/TripPredictor_2/blob/master/Deeplearning_seminaari_aho.pdf"> Deeplearning_seminaari_aho.pdf</a> for an use case example</b>
+<b> TL;DR : </b> See <a href="https://github.com/donkkis/TripPredictor_2/blob/master/Deeplearning_seminaari_aho.pdf"> Deeplearning_seminaari_aho.pdf</a> for an use case example, in Finnish, unfortunately :( 
 
 # Description
 
