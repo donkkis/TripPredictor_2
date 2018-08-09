@@ -1,5 +1,9 @@
 
-LSTM Network template for regression
+# LSTM Network template for regression
+
+<b> TL;DR : See <a href="https://github.com/donkkis/TripPredictor_2/blob/master/Deeplearning_seminaari_aho.pdf" Deeplearning_seminaari_aho.pdf</a> for an use case example</b>
+
+# Description
 
 Predict real valued output over multiple timesteps, given sequential inputdata. Formally, this LSTM network fits parameters to compute the function:
 
