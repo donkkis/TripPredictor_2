@@ -21,11 +21,14 @@ output_dim = output can be either scalar or vector - define dimensionality here
 """
 #%% IMPORTS
 from keras.models import Sequential
+from keras.models import load_model
 from keras.layers import Dense
 from keras.layers import TimeDistributed
 from keras.layers import LSTM
 from keras.layers import Dropout
 from keras.utils import Sequence
+from keras.callbacks import CSVLogger
+from keras.callbacks import ModelCheckpoint
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -35,7 +38,7 @@ import pandas as pd
 #%% SETTINGS / HYPERPARAMETERS
 
 #The number of entries in each timestep of input, e.g. data from different sensors
-input_dim = 6
+input_dim = 5
 
 #The dimension of the predicted variable
 output_dim = 1
@@ -47,23 +50,21 @@ LSTM_units = 200
 dropout_rate = 0.2
 test_ratio = 0.05
 batch_size = 32
-max_epochs = 50
+max_epochs = 200
 
 #static normalizing factors for input variables
 min_x = np.array(
         [0, 
-         60.415733,
-         22.111310,
-         0.2000000,
          0,
-         -39.88021])
+         -39.8802,
+         0,
+         35.4527])
 max_x = np.array(
         [1792,
-         60.520895,
-         22.341193,
-         57.200000,
-         255.99600,
-         51.320079])
+         255.9961,
+         51.3201,
+         7.1479,
+         39.1916])
 
 #Set random seed for reproducible train/test split
 random_seed = 42
@@ -140,7 +141,7 @@ class TripBatchGenerator(Sequence):
         return batch_x_tensor, batch_y_tensor
     
 #Import train data 
-data = sio.loadmat('trips_dataset_doubles.mat')
+data = sio.loadmat('../TripPredictor_2_data/trips_dataset_doubles_relative.mat')
 x, y = data['X'], data['Y']
 
 #Get the number of training examples
@@ -200,27 +201,35 @@ regressor.add(TimeDistributed(Dense(1)))
 
 print(regressor.summary())
 
+#Set up some useful stuff
+
+model_checkpoint = ModelCheckpoint('koulutus_240819_{epoch:02d}_{val_loss:.2f}.h5', monitor='val_loss', verbose=0, save_best_only=True)
+csv_logger = CSVLogger('koulutus_240818.log')
+
 #Compile and train the model
+
 regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
-regressor.fit_generator(ts, epochs=max_epochs, verbose=1, validation_data=ts_test)
+regressor.fit_generator(ts, epochs=max_epochs, verbose=1, validation_data=ts_test, callbacks=[model_checkpoint, csv_logger])
+
+regressor.save('koulutus_narvi_240818.h5')
 
 #%% TEST - Test set
 
 #Get the ground truth
-x_testbatch, ground_truth = ts_test.__getitem__(21)
+#x_testbatch, ground_truth = ts_test.__getitem__(21)
 
 #Make predictions
-predicted = regressor.predict(x_testbatch)
+#predicted = regressor.predict(x_testbatch)
 
 #Undo scaling
 
 #Visualize
-for i in range(len(predicted)):
-    plt.figure()
-    plt.plot(ground_truth[i, :], color = 'red', label = 'Ground Truth')
-    plt.plot(predicted[i, :], color = 'blue', label = 'Predicted')
-    plt.title('Delta SOC')
-    plt.xlabel('Timesteps')
-    plt.ylabel('SOC %')
-    plt.ylim((0.8, 1))
-    plt.legend()
+#for i in range(len(predicted)):
+#    plt.figure()
+#    plt.plot(ground_truth[i, :], color = 'red', label = 'Ground Truth')
+#    plt.plot(predicted[i, :], color = 'blue', label = 'Predicted')
+#    plt.title('Delta SOC')
+#    plt.xlabel('Timesteps')
+#    plt.ylabel('SOC %')
+#    plt.ylim((0.8, 1))
+#    plt.legend()
